@@ -8,7 +8,7 @@ resource "aws_vpc" "book-review-demo-vpc" {
 }
 
 #Creating the public & private subnets
-resource "aws_subnet" "book-review-demo-subnet-public1" { #Public Subnet
+resource "aws_subnet" "book-review-demo-subnet-public1" { #Public Subnet 1
   vpc_id            = aws_vpc.book-review-demo-vpc.id
   cidr_block        = "10.0.0.0/23"
   availability_zone = "us-east-1a"
@@ -62,7 +62,7 @@ resource "aws_route_table" "book-review-demo-private-rt" { #Private Route Table
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.book-review-demo-igw.id
+    gateway_id = aws_internet_gateway.book-review-demo-igw.id #In a production environment, you would typically use a NAT Gateway here instead of an Internet Gateway to allow outbound internet access for updates and patches while keeping the database secure and not directly accessible from the internet.
   }
 
   tags = {
@@ -75,7 +75,7 @@ resource "aws_route_table" "book-review-demo-public-rt" { #Public Route Table
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.book-review-demo-igw.id
+    gateway_id = aws_internet_gateway.book-review-demo-igw.id #The public route table needs a route to the Internet Gateway to allow internet access for the web and app servers for testing and configuration. In a production environment, you would typically place the web and app servers behind a load balancer and use auto-scaling groups for high availability and scalability, but for demo purposes we are placing them in the public subnet with direct internet access.
   }
 
   tags = {
@@ -107,6 +107,13 @@ resource "aws_security_group" "book_review_web_sg" { #Web Security Group
     cidr_blocks = ["0.0.0.0/0"] # Be cautious: this allows access from anywhere on the internet
   }
 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Be cautious: this allows SSH access from anywhere on the internet. In a production environment, you would typically restrict this to specific IP addresses or use a bastion host for secure access.
+  }
+
   egress {
     from_port   = 0
     to_port     = 65355
@@ -125,6 +132,13 @@ resource "aws_security_group" "book_review_app_sg" { #App Security Group
     to_port         = 3001
     protocol        = "tcp"
     security_groups = [aws_security_group.book_review_web_sg.id] #The app server can only receive traffic from the web server security group
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Be cautious: this allows SSH access from anywhere on the internet. In a production environment, you would typically restrict this to specific IP addresses or use a bastion host for secure access.
   }
 
   egress {

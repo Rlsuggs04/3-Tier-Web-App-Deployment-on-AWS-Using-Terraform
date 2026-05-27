@@ -11,7 +11,7 @@ resource "aws_db_instance" "mysql_db_instance" {
   skip_final_snapshot    = true                                      #Prevents errors during quick testing & deletion
   vpc_security_group_ids = [aws_security_group.book_review_db_sg.id] #Only allow access from the DB server security group
   db_subnet_group_name   = aws_db_subnet_group.mysql_subnet_group.id #Connecting it to the DB subnet group, which tells RDS where it can place the database
-  publicly_accessible    = false
+  publicly_accessible    = false                                     #Ensures the database is not directly accessible from the internet for security. In a production environment, you would typically set this to false and place the database in private subnets with no direct internet access, while allowing access from the app server security group for communication between the app server and database.
 
   tags = {
     Name = "MySQL DB Instance"
