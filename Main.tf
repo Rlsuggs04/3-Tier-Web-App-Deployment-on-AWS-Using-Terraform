@@ -12,12 +12,20 @@ resource "aws_db_instance" "mysql_db_instance" {
   vpc_security_group_ids = [aws_security_group.book_review_db_sg.id] #Only allow access from the DB server security group
   db_subnet_group_name   = aws_db_subnet_group.mysql_subnet_group.id #Connecting it to the DB subnet group, which tells RDS where it can place the database
   publicly_accessible    = false
+
+  tags = {
+    Name = "MySQL DB Instance"
+  }
 }
 
 #Creating key pairs for SSH access to the EC2 instances. This is required to connect to the app server for configuration and testing.
 resource "aws_key_pair" "app_server_key" {
   key_name   = "app-server-key"
   public_key = file("/Users/fwayrob/Cloud Projects/3-Tier-Web-App-Deployment-on-AWS-Using-Terraform/3 Tier Architecture Key.pub") #Replace with your own public key for secure access. In a production environment, you would typically generate a key pair and store the private key securely, while using the public key here for access.    
+
+  tags = {
+    Name = "App Server Key"
+  }
 }
 
 #Creating VM's for the web & app servers. 
@@ -28,6 +36,10 @@ resource "aws_instance" "web-server" {                  #Web server instance. Th
   vpc_security_group_ids      = [aws_security_group.book_review_web_sg.id]    #Only allow access from the web server security group
   subnet_id                   = aws_subnet.book-review-demo-subnet-public1.id #Placing the web server in the public subnet so it can be accessed from the internet for testing and configuration. 
   associate_public_ip_address = true
+
+  tags = {
+    Name = "Web Server"
+  }
 }
 
 resource "aws_eip" "app-eip" {
@@ -42,4 +54,8 @@ resource "aws_instance" "app-server" {                  #App server instance. Th
   vpc_security_group_ids      = [aws_security_group.book_review_app_sg.id]      #Only allow access from the app server security group
   subnet_id                   = aws_subnet.book-review-demo-subnet-public1.id #Placing the app server in the public subnet so it can be accessed from the internet for testing and configuration. In a production environment, you would typically place this behind a load balancer and use auto-scaling groups for high availability and scalability.
   associate_public_ip_address = true
+
+  tags = {
+    Name = "App Server"
+  }
 }
