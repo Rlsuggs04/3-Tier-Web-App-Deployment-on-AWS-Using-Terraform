@@ -141,6 +141,13 @@ resource "aws_security_group" "book_review_app_sg" { #App Security Group
     cidr_blocks = ["0.0.0.0/0"] # Be cautious: this allows SSH access from anywhere on the internet. In a production environment, you would typically restrict this to specific IP addresses or use a bastion host for secure access.
   }
 
+  ingress{ #Using this rule to debug connectivity between the web and app servers. This is not best practice for security, but it is necessary for testing and configuration. In a production environment, you would typically restrict this to specific IP addresses or use a bastion host for secure access.
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 65355
