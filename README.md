@@ -8,6 +8,11 @@ The architecture follows a clean separation of concerns between the presentation
 
 ---
 
+## Architecture Diagram
+
+![3-Tier AWS Architecture](./images/3_Tier_Architecture_Diagram.png) 
+
+---
 ## Architecture Overview
 
 The environment is deployed within a custom **Amazon VPC** using public and private subnets to enforce network segmentation and security isolation.
